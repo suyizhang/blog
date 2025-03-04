@@ -3,7 +3,7 @@ declare module 'remark-prism' {
 
   interface PrismOptions {
     plugins?: string[];
-    [key: string]: any;
+    [key: string]: unknown;
   }
 
   const prism: Plugin<[PrismOptions] | []>;

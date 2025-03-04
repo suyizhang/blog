@@ -4,8 +4,12 @@ import Link from 'next/link';
 import 'prismjs/themes/prism.css';
 import './styles.css';
 
-export default async function BlogPost({ params }: { params: { slug: string } }) {
-  const post = await getPostBySlug(params.slug);
+
+type tParams = Promise<{ slug: string }>;
+
+export default async function BlogPost({ params }: { params: tParams }) {
+  const { slug } = await params;
+  const post = await getPostBySlug(slug);
 
   // 更新当前文章状态
   useBlogStore.setState({ currentPost: post });
