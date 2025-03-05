@@ -1,8 +1,11 @@
 import Link from "next/link";
+import ParticleBackground from "./components/ParticleBackground";
 
 export default function Home() {
   return (
-    <div className="max-w-4xl mx-auto px-4 py-16">
+    <>
+      <ParticleBackground />
+      <div className="max-w-4xl mx-auto px-4 py-16">
       <section className="mb-20">
         <h1 className="text-5xl font-bold mb-8 bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent animate-fadeIn">你好，我是 Suyi Zhang 👋</h1>
         <p className="text-xl text-gray-600 mb-10 leading-relaxed animate-slideUp">
@@ -56,5 +59,6 @@ export default function Home() {
         </div>
       </section>
     </div>
+    </>
   );
 }

@@ -1,14 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Navigation() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+    if (token && userStr) {
+      setIsLoggedIn(true);
+      setUser(JSON.parse(userStr));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setIsLoggedIn(false);
+    setUser(null);
+    setIsDropdownOpen(false);
+  };
+
   const toggleMenu = () => {
     const menu = document.getElementById('mobile-menu');
     if (menu) {
       menu.classList.toggle('hidden');
-      // 添加一个小延迟来触发动画
       requestAnimationFrame(() => {
         menu.classList.toggle('menu-open');
       });
@@ -19,14 +39,12 @@ export default function Navigation() {
     const menu = document.getElementById('mobile-menu');
     if (menu) {
       menu.classList.remove('menu-open');
-      // 等待动画完成后再隐藏菜单
       setTimeout(() => {
         menu.classList.add('hidden');
       }, 300);
     }
   };
 
-  // 监听路由变化，关闭菜单
   useEffect(() => {
     closeMenu();
   }, []);
@@ -42,6 +60,41 @@ export default function Navigation() {
           <Link href="/portfolio" onClick={closeMenu} className="relative text-base font-medium text-gray-700 hover:text-primary transition-colors duration-200 after:absolute after:bottom-[-2px] after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all after:duration-200 hover:after:w-full">作品集</Link>
           <Link href="/blog" onClick={closeMenu} className="relative text-base font-medium text-gray-700 hover:text-primary transition-colors duration-200 after:absolute after:bottom-[-2px] after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all after:duration-200 hover:after:w-full">博客</Link>
           <Link href="/about" onClick={closeMenu} className="relative text-base font-medium text-gray-700 hover:text-primary transition-colors duration-200 after:absolute after:bottom-[-2px] after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all after:duration-200 hover:after:w-full">关于</Link>
+          {isLoggedIn ? (
+            <div className="relative">
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="flex items-center gap-2 text-base font-medium text-gray-700 hover:text-primary transition-colors duration-200"
+              >
+                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
+                  {user?.name?.[0] || user?.email?.[0] || '?'}
+                </div>
+              </button>
+              {isDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                  <div className="py-1">
+                    <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
+                      <p className="font-medium">{user?.name || '用户'}</p>
+                      <p className="text-gray-500 truncate">{user?.email}</p>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary transition-colors duration-200"
+                    >
+                      退出登录
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              href="/auth/login"
+              className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark transition-colors duration-200"
+            >
+              登录
+            </Link>
+          )}
         </div>
         {/* 移动端菜单按钮 */}
         <button
@@ -90,6 +143,35 @@ export default function Navigation() {
           >
             关于
           </Link>
+          {isLoggedIn ? (
+            <div className="border-t border-gray-200 mt-2 pt-2">
+              <div className="px-4 py-2.5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center text-lg">
+                    {user?.name?.[0] || user?.email?.[0] || '?'}
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">{user?.name || '用户'}</p>
+                    <p className="text-sm text-gray-500 truncate">{user?.email}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="mt-2 w-full text-left px-4 py-2.5 text-base font-medium text-gray-700 rounded-lg hover:bg-gray-100/80 hover:text-primary active:bg-gray-200/80 transition-all duration-200"
+                >
+                  退出登录
+                </button>
+              </div>
+            </div>
+          ) : (
+            <Link
+              href="/auth/login"
+              onClick={closeMenu}
+              className="block px-4 py-2.5 text-base font-medium text-white bg-primary rounded-lg hover:bg-primary-dark transition-all duration-200"
+            >
+              登录
+            </Link>
+          )}
         </div>
       </div>
     </header>
