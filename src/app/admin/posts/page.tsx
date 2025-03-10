@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Table, Button, Input, Tag, Modal, message } from 'antd';
+import { Table, Button, Input, Tag, Modal } from 'antd';
 import { Space } from 'antd';
 import { EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 import Link from 'next/link';
@@ -18,7 +18,6 @@ interface Post {
 }
 
 export default function PostsManagement() {
-  const [messageApi] = message.useMessage();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -26,10 +25,10 @@ export default function PostsManagement() {
 
   useEffect(() => {
     if (error) {
-      messageApi.error(error);
+      console.log(error);
       setError(null);
     }
-  }, [error, messageApi]);
+  }, [error]);
 
   const fetchPosts = async () => {
     try {
@@ -59,7 +58,6 @@ export default function PostsManagement() {
           });
           const data = await response.json();
           if (data.success) {
-            messageApi.success('文章删除成功');
             fetchPosts();
           } else {
             setError(data.message || '删除文章失败');
