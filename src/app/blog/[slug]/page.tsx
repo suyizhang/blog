@@ -1,6 +1,7 @@
 import { getPostBySlug } from '../utils';
 import { useBlogStore } from '../store';
 import Link from 'next/link';
+import Comments from '../../components/Comments';
 import 'prismjs/themes/prism.css';
 import './styles.css';
 
@@ -56,6 +57,12 @@ export default async function BlogPost({ params }: { params: tParams }) {
           </footer>
         )}
       </article>
+      <Comments
+        repo="your-github-username/blog"
+        repoId="R_kgDOLXXXXX"
+        category="Comments"
+        categoryId="DIC_kwDOLXXXXXc"
+      />
     </div>
   );
 }
