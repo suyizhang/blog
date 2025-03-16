@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Table, Space, Button, Input, Modal, message } from 'antd';
+import { Table, Space, Button, Input, Modal } from 'antd';
 import { EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 
 interface User {
@@ -13,17 +13,15 @@ interface User {
 }
 
 export default function UsersManagement() {
-  const [messageApi] = message.useMessage();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     if (error) {
-      messageApi.error(error);
       setError(null);
     }
-  }, [error, messageApi]);
+  }, [error]);
 
   const fetchUsers = async () => {
     try {
@@ -53,10 +51,10 @@ export default function UsersManagement() {
           });
           const data = await response.json();
           if (data.code === 200) {
-            messageApi.open({
-              type: 'success',
-              content: '用户删除成功'
-            });
+            // messageApi.open({
+            //   type: 'success',
+            //   content: '用户删除成功'
+            // });
             fetchUsers();
           } else {
             setError(data.message || '删除用户失败');
