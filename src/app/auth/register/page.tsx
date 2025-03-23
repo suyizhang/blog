@@ -9,7 +9,7 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    name: '',
+    username: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:7001/api/user/register', {
+      const response = await fetch('http://localhost:7001/cgi/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -86,11 +86,12 @@ export default function RegisterPage() {
               <label htmlFor="name" className="sr-only">用户名</label>
               <input
                 id="name"
-                name="name"
+                name="username"
                 type="text"
                 className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:z-10 sm:text-sm transition-all duration-300 ease-in-out"
-                placeholder="用户名（选填）"
-                value={formData.name}
+                required
+                placeholder="用户名"
+                value={formData.username}
                 onChange={handleChange}
               />
             </div>

@@ -10,6 +10,7 @@
     "pm2start": "pm2 start ecosystem.config.js"
   },
   "dependencies": {
+    "@next/font": "^14.2.15",
     "@types/prismjs": "^1.26.5",
     "antd": "^5.24.2",
     "gray-matter": "^4.0.3",

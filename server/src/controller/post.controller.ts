@@ -13,7 +13,7 @@ import { Context } from '@midwayjs/koa';
 import { PostService } from '../service/post.service';
 import { CreatePostDTO, UpdatePostDTO, QueryPostDTO } from '../dto/post.dto';
 
-@Controller('/blog/posts')
+@Controller('/cgi/blog/posts')
 export class PostController {
   @Inject()
   ctx: Context;

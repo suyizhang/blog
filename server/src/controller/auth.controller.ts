@@ -3,7 +3,7 @@ import { Context } from '@midwayjs/koa';
 import { AuthService } from '../service/auth.service';
 import { RegisterDTO, LoginDTO, UpdateUserDTO } from '../dto/auth.dto';
 
-@Controller('/auth')
+@Controller('/cgi/auth')
 export class AuthController {
   @Inject()
   ctx: Context;

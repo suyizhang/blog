@@ -1,3 +1,5 @@
+'use server';
+
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
@@ -30,7 +32,7 @@ export async function getAllPosts(): Promise<BlogPost[]> {
 
 export async function getPostBySlug(slug: string): Promise<BlogPost> {
   const fullPath = path.join(postsDirectory, `${slug}.md`);
-  const fileContents = fs.readFileSync(fullPath, 'utf8');
+  const fileContents = await fs.promises.readFile(fullPath, 'utf8');
 
   // 使用gray-matter解析markdown文件的front matter
   const { data, content } = matter(fileContents);
@@ -62,17 +64,19 @@ export async function getPostBySlug(slug: string): Promise<BlogPost> {
   };
 }
 
-export function getAllCategories() {
-  const posts = fs.readdirSync(postsDirectory)
-    .filter(fileName => fileName.endsWith('.md'))
-    .map(fileName => {
-      const fileContents = fs.readFileSync(
-        path.join(postsDirectory, fileName),
-        'utf8'
-      );
-      const { data } = matter(fileContents);
-      return data.category;
-    });
+export async function getAllCategories() {
+  const posts = await Promise.all(
+    fs.readdirSync(postsDirectory)
+      .filter(fileName => fileName.endsWith('.md'))
+      .map(async fileName => {
+        const fileContents = await fs.promises.readFile(
+          path.join(postsDirectory, fileName),
+          'utf8'
+        );
+        const { data } = matter(fileContents);
+        return data.category;
+      })
+  );
 
   const categories = posts.filter(Boolean);
   const categoryCounts = categories.reduce((acc, category) => {
@@ -84,20 +88,22 @@ export function getAllCategories() {
     name,
     slug: name.toLowerCase().replace(/\s+/g, '-'),
     count,
-  }));
+  }))
 }
 
-export function getAllTags() {
-  const posts = fs.readdirSync(postsDirectory)
-    .filter(fileName => fileName.endsWith('.md'))
-    .map(fileName => {
-      const fileContents = fs.readFileSync(
-        path.join(postsDirectory, fileName),
-        'utf8'
-      );
-      const { data } = matter(fileContents);
-      return data.tags || [];
-    });
+export async function getAllTags() {
+  const posts = await Promise.all(
+    fs.readdirSync(postsDirectory)
+      .filter(fileName => fileName.endsWith('.md'))
+      .map(async fileName => {
+        const fileContents = await fs.promises.readFile(
+          path.join(postsDirectory, fileName),
+          'utf8'
+        );
+        const { data } = matter(fileContents);
+        return data.tags || [];
+      })
+  );
 
   const tags = posts.flat();
   const tagCounts = tags.reduce((acc, tag) => {

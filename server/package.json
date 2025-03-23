@@ -14,6 +14,7 @@
     "@midwayjs/mongoose": "^3.20.3",
     "@midwayjs/validate": "^3.12.0",
     "@typegoose/typegoose": "^12.13.0",
+    "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
     "mongoose": "^8.2.1"
   },

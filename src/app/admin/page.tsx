@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Layout, Menu, theme } from 'antd';
-import { UserOutlined, FileOutlined, DashboardOutlined } from '@ant-design/icons';
+import { UserOutlined, FileOutlined, DashboardOutlined, TeamOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -26,6 +26,12 @@ const menuItems = [
     icon: <UserOutlined />,
     label: '用户管理',
     path: '/admin/users'
+  },
+  {
+    key: 'roles',
+    icon: <TeamOutlined />,
+    label: '角色管理',
+    path: '/admin/roles'
   }
 ];
 

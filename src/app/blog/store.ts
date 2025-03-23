@@ -31,6 +31,7 @@ export const useBlogStore = create<BlogStore>((set) => ({
     try {
       set({ isLoading: true, error: null });
       const posts = await getAllPosts();
+      console.log(posts, '34');
       set({ posts, isLoading: false });
     } catch (error) {
       set({ error: error instanceof Error ? error.message : '获取文章列表失败', isLoading: false });

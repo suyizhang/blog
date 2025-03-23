@@ -58,9 +58,9 @@ export default async function BlogPost({ params }: { params: tParams }) {
         )}
       </article>
       <Comments
-        repo="your-github-username/blog"
+        repo="Evansy/blog"
         repoId="R_kgDOLXXXXX"
-        category="Comments"
+        category="Announcements"
         categoryId="DIC_kwDOLXXXXXc"
       />
     </div>

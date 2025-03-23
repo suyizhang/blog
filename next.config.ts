@@ -10,10 +10,11 @@ const config: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:7001/:path*',
+        destination: 'http://localhost:7001/api/:path*',
       },
     ];
   },
+  experimental: {},
 };
 
 export default config;

@@ -1,4 +1,10 @@
-import { prop, modelOptions, getModelForClass } from '@typegoose/typegoose';
+import {
+  prop,
+  modelOptions,
+  getModelForClass,
+  Ref,
+} from '@typegoose/typegoose';
+import { Role } from './role.entity';
 
 @modelOptions({
   schemaOptions: {
@@ -24,6 +30,18 @@ export class User {
 
   @prop({ default: false })
   isAdmin: boolean;
+
+  @prop({ ref: () => Role })
+  roles?: Ref<Role>[];
+
+  @prop()
+  resetPasswordToken?: string;
+
+  @prop()
+  resetPasswordExpires?: Date;
+
+  @prop()
+  githubId?: string;
 
   createdAt: Date;
   updatedAt: Date;
