@@ -1,0 +1,20 @@
+{
+  "path": "/Users/suyizhang/suyi/suyizhang ",
+  "desc": "This is a modern personal website project built with React 18, TypeScript, and Tailwind CSS. Features include responsive design, dark/light theme toggle, GitHub OAuth authentication, project showcase, contact form, and smooth animations. The website includes Home, About, Projects, Contact, and Dashboard pages with a professional design optimized for both desktop and mobile devices.",
+  "id": "80da7945feda4fdc9898e70eda16dfa6",
+  "data": {
+    "spaceKey": "80da7945feda4fdc9898e70eda16dfa6",
+    "connections": {
+      "webIDE": "https://80da7945feda4fdc9898e70eda16dfa6.ap-singapore.cloudstudio.club",
+      "preview": "",
+      "api": "https://80da7945feda4fdc9898e70eda16dfa6--api.ap-singapore.cloudstudio.club",
+      "pty": "https://80da7945feda4fdc9898e70eda16dfa6--pty.ap-singapore.cloudstudio.club"
+    }
+  },
+  "config": {
+    "api": "https://80da7945feda4fdc9898e70eda16dfa6--api.ap-singapore.cloudstudio.club",
+    "pty": "https://80da7945feda4fdc9898e70eda16dfa6--pty.ap-singapore.cloudstudio.club",
+    "region": "ap-shanghai",
+    "spaceKey": "80da7945feda4fdc9898e70eda16dfa6"
+  }
+}

@@ -1,0 +1,224 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 用户模型
+model User {
+  id          String   @id @default(cuid())
+  githubId    String   @unique
+  login       String   @unique
+  email       String?  @unique
+  name        String?
+  bio         String?
+  location    String?
+  website     String?
+  avatarUrl   String?
+  company     String?
+  blog        String?
+  followers   Int      @default(0)
+  following   Int      @default(0)
+  publicRepos Int      @default(0)
+  
+  // 个人网站相关字段
+  title       String?  // 职位标题
+  skills      String?  // 技能列表 (JSON string)
+  experience  String?  // 工作经验描述
+  education   String?  // 教育背景
+  
+  // 系统字段
+  isActive    Boolean  @default(true)
+  role        Role     @default(USER)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lastLoginAt DateTime?
+  
+  // 关联关系
+  projects    Project[]
+  blogPosts   BlogPost[]
+  contacts    Contact[]
+  
+  @@map("users")
+}
+
+// 用户角色枚举
+enum Role {
+  USER
+  ADMIN
+}
+
+// 项目模型
+model Project {
+  id          String      @id @default(cuid())
+  title       String
+  description String
+  content     String?     // 详细描述
+  technologies String?    // 技术栈 (JSON string)
+  githubUrl   String?
+  liveUrl     String?
+  imageUrl    String?
+  category    ProjectCategory
+  status      ProjectStatus @default(COMPLETED)
+  featured    Boolean     @default(false)
+  views       Int         @default(0)
+  likes       Int         @default(0)
+  
+  // 时间字段
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  // 关联用户
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("projects")
+}
+
+// 项目分类枚举
+enum ProjectCategory {
+  FRONTEND
+  BACKEND
+  FULLSTACK
+  MOBILE
+  DESKTOP
+  OTHER
+}
+
+// 项目状态枚举
+enum ProjectStatus {
+  PLANNING
+  IN_PROGRESS
+  COMPLETED
+  ARCHIVED
+}
+
+// 博客文章模型
+model BlogPost {
+  id          String      @id @default(cuid())
+  title       String
+  slug        String      @unique
+  content     String
+  excerpt     String?
+  coverImage  String?
+  tags        String?  // JSON string
+  category    String?
+  published   Boolean     @default(false)
+  views       Int         @default(0)
+  likes       Int         @default(0)
+  
+  // SEO字段
+  metaTitle       String?
+  metaDescription String?
+  
+  // 时间字段
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // 关联用户
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("blog_posts")
+}
+
+// 联系表单模型
+model Contact {
+  id        String      @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  status    ContactStatus @default(UNREAD)
+  ipAddress String?
+  userAgent String?
+  
+  // 时间字段
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  
+  // 关联用户（可选，如果是已登录用户发送的）
+  userId    String?
+  user      User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@map("contacts")
+}
+
+// 联系状态枚举
+enum ContactStatus {
+  UNREAD
+  READ
+  REPLIED
+  ARCHIVED
+}
+
+// 技能模型
+model Skill {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  category    String     // 技能分类：frontend, backend, tools, etc.
+  level       SkillLevel @default(INTERMEDIATE)
+  description String?
+  iconUrl     String?
+  color       String?    // 用于UI显示的颜色
+  order       Int        @default(0) // 显示顺序
+  
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  
+  @@map("skills")
+}
+
+// 技能水平枚举
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+// 网站设置模型
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+  type  SettingType @default(STRING)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("settings")
+}
+
+// 设置类型枚举
+enum SettingType {
+  STRING
+  NUMBER
+  BOOLEAN
+  JSON
+}
+
+// 访问统计模型
+model Analytics {
+  id        String   @id @default(cuid())
+  path      String   // 访问路径
+  method    String   // HTTP方法
+  userAgent String?  // 用户代理
+  ipAddress String?  // IP地址
+  referer   String?  // 来源页面
+  country   String?  // 国家
+  city      String?  // 城市
+  
+  createdAt DateTime @default(now())
+  
+  @@map("analytics")
+}
