@@ -13,6 +13,7 @@
     "type-check": "tsc --noEmit",
     "test": "echo \"No tests specified\" && exit 0",
     "seed": "tsx src/scripts/seed.ts",
+    "verify-oauth": "tsx src/scripts/verify-oauth.ts",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
