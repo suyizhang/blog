@@ -9,7 +9,18 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix"
+    "lint:fix": "eslint src --ext .ts --fix",
+    "type-check": "tsc --noEmit",
+    "test": "echo \"No tests specified\" && exit 0",
+    "seed": "tsx src/scripts/seed.ts",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:prod": "prisma migrate deploy",
+    "db:studio": "prisma studio",
+    "deploy:railway": "railway up",
+    "deploy:render": "echo \"Deploy to Render via Git push\"",
+    "postbuild": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.12.0",
