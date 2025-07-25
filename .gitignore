@@ -198,3 +198,4 @@ temp/
 # Local configuration overrides
 config.local.js
 config.local.json
+.vercel
