@@ -78,8 +78,8 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
-          GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
+          GITHUB_CLIENT_ID: ${{ secrets.SUYIZHANG_GITHUB_CLIENT_ID }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.SUYIZHANG_GITHUB_CLIENT_SECRET }}
           CORS_ORIGIN: ${{ secrets.CORS_ORIGIN }}
 
   # Alternative: Deploy to Netlify (if preferred over Vercel)
