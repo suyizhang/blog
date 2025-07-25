@@ -1,115 +1,157 @@
-name: Deploy to Production
+name: 部署到个人服务器
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_dispatch: # 允许手动触发部署
 
 jobs:
-  # Frontend deployment to Vercel
-  deploy-frontend:
-    name: Deploy Frontend
+  deploy:
+    name: 部署到个人服务器
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout code
+      - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: 设置 Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "18"
           cache: "npm"
 
-      - name: Install dependencies
+      # 构建前端
+      - name: 安装前端依赖
         run: npm ci
 
-      - name: Run tests
+      - name: 运行前端测试
         run: npm run test:ci --if-present
 
-      - name: Build frontend
+      - name: 构建前端
         run: npm run build
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
           VITE_GITHUB_CLIENT_ID: ${{ secrets.VITE_GITHUB_CLIENT_ID }}
 
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: "--prod"
-
-  # Backend deployment to Railway
-  deploy-backend:
-    name: Deploy Backend
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
-          cache: "npm"
-          cache-dependency-path: backend/package-lock.json
-
-      - name: Install backend dependencies
+      # 构建后端
+      - name: 安装后端依赖
         run: |
           cd backend
           npm ci
 
-      - name: Run backend tests
+      - name: 运行后端测试
         run: |
           cd backend
           npm run test --if-present
 
-      - name: Build backend
+      - name: 构建后端
         run: |
           cd backend
           npm run build
 
-      - name: Deploy to Railway
-        uses: railway-app/railway@v1
+      # 部署到个人服务器
+      - name: 部署到服务器
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          railway-token: ${{ secrets.RAILWAY_TOKEN }}
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
-          GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
-          CORS_ORIGIN: ${{ secrets.CORS_ORIGIN }}
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script: |
+            # 设置部署目录
+            DEPLOY_DIR="/var/www/personal-website"
+            BACKUP_DIR="/var/backups/personal-website-$(date +%Y%m%d-%H%M%S)"
+            
+            # 创建备份
+            if [ -d "$DEPLOY_DIR" ]; then
+              echo "创建备份到 $BACKUP_DIR"
+              sudo cp -r $DEPLOY_DIR $BACKUP_DIR
+            fi
+            
+            # 创建部署目录
+            sudo mkdir -p $DEPLOY_DIR
+            cd $DEPLOY_DIR
+            
+            # 拉取最新代码
+            if [ -d ".git" ]; then
+              echo "更新现有仓库"
+              sudo git fetch origin
+              sudo git reset --hard origin/main
+            else
+              echo "克隆新仓库"
+              sudo git clone https://github.com/${{ github.repository }}.git .
+            fi
+            
+            # 安装依赖并构建
+            echo "安装前端依赖"
+            sudo npm ci
+            
+            echo "构建前端"
+            sudo npm run build
+            
+            echo "安装后端依赖"
+            cd backend
+            sudo npm ci
+            
+            echo "构建后端"
+            sudo npm run build
+            
+            # 设置环境变量
+            echo "设置环境变量"
+            sudo tee .env > /dev/null <<EOF
+            DATABASE_URL="${{ secrets.DATABASE_URL }}"
+            JWT_SECRET="${{ secrets.JWT_SECRET }}"
+            SESSION_SECRET="${{ secrets.SESSION_SECRET }}"
+            GITHUB_CLIENT_ID="${{ secrets.GITHUB_CLIENT_ID }}"
+            GITHUB_CLIENT_SECRET="${{ secrets.GITHUB_CLIENT_SECRET }}"
+            GITHUB_CALLBACK_URL="${{ secrets.GITHUB_CALLBACK_URL }}"
+            PORT=5001
+            NODE_ENV=production
+            FRONTEND_URL="${{ secrets.FRONTEND_URL }}"
+            EOF
+            
+            # 数据库迁移
+            echo "运行数据库迁移"
+            sudo npx prisma generate
+            sudo npx prisma db push
+            
+            # 重启服务
+            echo "重启应用服务"
+            sudo systemctl restart personal-website-backend || echo "后端服务重启失败，可能需要手动配置"
+            sudo systemctl restart nginx || echo "Nginx重启失败"
+            
+            echo "部署完成！"
 
-  # Alternative: Deploy to Netlify (if preferred over Vercel)
-  deploy-frontend-netlify:
-    name: Deploy Frontend to Netlify
-    runs-on: ubuntu-latest
-    if: false # Set to true if you want to use Netlify instead of Vercel
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # 健康检查
+      - name: 健康检查
+        run: |
+          echo "等待服务启动..."
+          sleep 30
+          
+          # 检查后端API
+          if curl -f ${{ secrets.VITE_API_URL }}/health; then
+            echo "✅ 后端API健康检查通过"
+          else
+            echo "❌ 后端API健康检查失败"
+            exit 1
+          fi
+          
+          # 检查前端
+          if curl -f ${{ secrets.FRONTEND_URL }}; then
+            echo "✅ 前端健康检查通过"
+          else
+            echo "❌ 前端健康检查失败"
+            exit 1
+          fi
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build frontend
-        run: npm run build
-        env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
-          VITE_GITHUB_CLIENT_ID: ${{ secrets.VITE_GITHUB_CLIENT_ID }}
-
-      - name: Deploy to Netlify
-        uses: netlify/actions/cli@master
-        with:
-          args: deploy --prod --dir=dist
-        env:
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      # 发送通知
+      - name: 发送部署通知
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "🎉 部署成功！"
+            echo "前端地址: ${{ secrets.FRONTEND_URL }}"
+            echo "后端API: ${{ secrets.VITE_API_URL }}"
+          else
+            echo "❌ 部署失败，请检查日志"
+          fi

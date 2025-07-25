@@ -1,0 +1,18 @@
+[Unit]
+Description=Personal Website Backend Service
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/personal-website/backend
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node dist/server.js
+Restart=on-failure
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=personal-website-backend
+
+[Install]
+WantedBy=multi-user.target
